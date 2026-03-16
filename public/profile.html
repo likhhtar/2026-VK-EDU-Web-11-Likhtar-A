@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Q&A Site</title>
+    <link rel="icon" type="image/svg+xml" href="static/img/logo.svg">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="static/img/logo.svg" alt="Q&A Site" height="30">
+            </a>
+            <form class="d-flex flex-grow-1 mx-3" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search questions..." aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+            <a href="ask.html" class="btn btn-warning me-3">Ask Question</a>
+            <div class="navbar-nav">
+                <div class="nav-item dropdown user-authenticated">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="static/img/avatar.svg" alt="User Avatar" class="rounded-circle me-2" width="32" height="32">
+                        <span>john_doe</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                    </ul>
+                </div>
+                <div class="user-not-authenticated d-none">
+                    <a href="login.html" class="btn btn-outline-light me-2">Login</a>
+                    <a href="signup.html" class="btn btn-light">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow-1">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-lg-8 col-md-12 mb-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                        </ol>
+                    </nav>
+
+                    <div class="form-container">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="static/img/avatar.svg" alt="User Avatar" class="rounded-circle me-4" width="80" height="80">
+                            <div>
+                                <h2 class="mb-1">john_doe</h2>
+                                <p class="text-muted mb-2">Member since January 2024</p>
+                                <div class="d-flex gap-3">
+                                    <span class="badge bg-primary">1,234 points</span>
+                                    <span class="badge bg-success">15 questions</span>
+                                    <span class="badge bg-info">42 answers</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions" type="button" role="tab">My Questions</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="answers-tab" data-bs-toggle="tab" data-bs-target="#answers" type="button" role="tab">My Answers</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">Settings</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="profileTabsContent">
+                            <div class="tab-pane fade show active" id="questions" role="tabpanel">
+                                <div class="question-card">
+                                    <h5><a href="question.html">How to center a div horizontally and vertically in CSS?</a></h5>
+                                    <p class="text-muted">Asked 2 hours ago • 3 answers • 127 views</p>
+                                    <div class="question-tags">
+                                        <span class="badge bg-secondary">css</span>
+                                        <span class="badge bg-secondary">html</span>
+                                        <span class="badge bg-secondary">flexbox</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="answers" role="tabpanel">
+                                <div class="answer-card">
+                                    <h6><a href="question.html">How to handle async/await in Python?</a></h6>
+                                    <p>You can use asyncio library for handling asynchronous operations in Python...</p>
+                                    <small class="text-muted">Answered 1 day ago • 5 upvotes</small>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="settings" role="tabpanel">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="displayName" class="form-label">Display Name</label>
+                                        <input type="text" class="form-control" id="displayName" value="john_doe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" value="john@example.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bio" class="form-label">Bio</label>
+                                        <textarea class="form-control" id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <div class="sidebar">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Activity Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Questions Asked:</span>
+                                    <strong>15</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Answers Given:</span>
+                                    <strong>42</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Best Answers:</span>
+                                    <strong>8</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Total Points:</span>
+                                    <strong>1,234</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Top Tags</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-secondary">javascript</span>
+                                    <span class="badge bg-secondary">python</span>
+                                    <span class="badge bg-secondary">css</span>
+                                    <span class="badge bg-secondary">html</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Q&A Site</h5>
+                    <p class="mb-0">A community-driven question and answer platform.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Q&A Site. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="static/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/script.js"></script>
+</body>
+</html>

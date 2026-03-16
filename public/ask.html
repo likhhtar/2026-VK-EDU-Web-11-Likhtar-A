@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask a Question - Q&A Site</title>
+    <link rel="icon" type="image/svg+xml" href="static/img/logo.svg">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="static/img/logo.svg" alt="Q&A Site" height="30">
+            </a>
+
+            <form class="d-flex flex-grow-1 mx-3" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search questions..." aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+
+            <a href="ask.html" class="btn btn-warning me-3">Ask Question</a>
+
+            <div class="navbar-nav">
+                <div class="nav-item dropdown user-authenticated d-none">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="static/img/avatar.svg" alt="User Avatar" class="rounded-circle me-2" width="32" height="32">
+                        <span>username</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+
+                <div class="user-not-authenticated">
+                    <a href="login.html" class="btn btn-outline-light me-2">Login</a>
+                    <a href="signup.html" class="btn btn-light">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow-1">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-lg-8 col-md-12 mb-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">Questions</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Ask Question</li>
+                        </ol>
+                    </nav>
+
+                    <div class="mb-4">
+                        <h1>Ask a Question</h1>
+                        <p class="text-muted">Get help from the community by asking a clear, detailed question.</p>
+                    </div>
+
+                    <div class="form-container">
+                        <form id="askForm">
+                            <div class="form-group">
+                                <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required 
+                                       placeholder="e.g., How to center a div in CSS?">
+                                <div class="form-text">
+                                    Be specific and imagine you're asking a question to another person.
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please provide a clear, descriptive title for your question.
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="text" class="form-label">Question Details <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="text" name="text" rows="10" required
+                                          placeholder="Describe your problem in detail. Include what you've tried and what you expected to happen."></textarea>
+                                <div class="form-text">
+                                    Include all the information someone would need to answer your question. You can use markdown for formatting.
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please provide detailed information about your question.
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tags" class="form-label">Tags</label>
+                                <input type="text" class="form-control" id="tags" name="tags" 
+                                       placeholder="Add tags separated by commas (e.g., javascript, css, html)">
+                                <div class="form-text">
+                                    Add up to 5 tags to describe what your question is about. Press Enter or comma to add a tag.
+                                </div>
+                                <div id="tagContainer" class="mt-2"></div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">Writing a good question</h6>
+                                <ul class="mb-0">
+                                    <li>Make your title specific and descriptive</li>
+                                    <li>Explain what you've tried and what didn't work</li>
+                                    <li>Include relevant code, error messages, or screenshots</li>
+                                    <li>Use proper formatting and grammar</li>
+                                    <li>Add relevant tags to help others find your question</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Post Your Question</button>
+                                <a href="index.html" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <div class="sidebar">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Tips for Asking</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Search first</h6>
+                                    <p class="small text-muted">Check if your question has already been asked and answered.</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Be specific</h6>
+                                    <p class="small text-muted">Include details about what you're trying to achieve and what's not working.</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Show your work</h6>
+                                    <p class="small text-muted">Include code, error messages, and what you've already tried.</p>
+                                </div>
+                                <div>
+                                    <h6>Use proper tags</h6>
+                                    <p class="small text-muted">Add relevant tags to help others find and answer your question.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Popular Tags</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-secondary tag-javascript">javascript</span>
+                                    <span class="badge bg-secondary tag-python">python</span>
+                                    <span class="badge bg-secondary tag-html">html</span>
+                                    <span class="badge bg-secondary tag-css">css</span>
+                                    <span class="badge bg-secondary tag-react">react</span>
+                                    <span class="badge bg-secondary tag-nodejs">node.js</span>
+                                    <span class="badge bg-secondary tag-django">django</span>
+                                    <span class="badge bg-secondary tag-bootstrap">bootstrap</span>
+                                </div>
+                                <div class="form-text mt-2">
+                                    Click on a tag to add it to your question.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Q&A Site</h5>
+                    <p class="mb-0">A community-driven question and answer platform.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Q&A Site. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="static/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/script.js"></script>
+</body>
+</html>

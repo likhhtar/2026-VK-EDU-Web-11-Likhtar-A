@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Q&A Site</title>
+    <link rel="icon" type="image/svg+xml" href="static/img/logo.svg">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="static/img/logo.svg" alt="Q&A Site" height="30">
+            </a>
+
+            <form class="d-flex flex-grow-1 mx-3" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search questions..." aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+
+            <a href="ask.html" class="btn btn-warning me-3">Ask Question</a>
+
+            <div class="navbar-nav">
+                <div class="nav-item dropdown user-authenticated d-none">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="static/img/avatar.svg" alt="User Avatar" class="rounded-circle me-2" width="32" height="32">
+                        <span>username</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+
+                <div class="user-not-authenticated">
+                    <a href="login.html" class="btn btn-outline-light me-2">Login</a>
+                    <a href="signup.html" class="btn btn-light">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow-1 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="form-container">
+                        <div class="text-center mb-4">
+                            <img src="static/img/logo.svg" alt="Q&A Site" height="60" class="mb-3">
+                            <h2>Welcome Back</h2>
+                            <p class="text-muted">Sign in to your account</p>
+                        </div>
+
+                        <div class="alert alert-danger d-none" id="loginError">
+                            <strong>Login Failed!</strong> Invalid email or password. Please try again.
+                        </div>
+
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required 
+                                       placeholder="Enter your email">
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address.
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" name="password" required 
+                                           placeholder="Enter your password">
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <span id="toggleIcon">👁️</span>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Password is required.
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                                <label class="form-check-label" for="rememberMe">
+                                    Remember me
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
+
+                            <div class="text-center mb-3">
+                                <a href="#" class="text-decoration-none">Forgot your password?</a>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="text-center">
+                                <p class="mb-0">Don't have an account? 
+                                    <a href="signup.html" class="text-decoration-none fw-bold">Sign up here</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Q&A Site</h5>
+                    <p class="mb-0">A community-driven question and answer platform.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Q&A Site. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="static/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/script.js"></script>
+</body>
+</html>
