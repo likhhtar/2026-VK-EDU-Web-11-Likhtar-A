@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} - EDU-Web{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>{{ page_title }}</h1>
+            <a href="{% url 'core:ask' %}" class="btn btn-primary">Ask Question</a>
+        </div>
+        
+        {% if questions %}
+            <div class="questions-list">
+                {% for question in questions %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2 text-center">
+                                    <div class="question-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-number">{{ question.votes }}</span>
+                                            <span class="stat-label">votes</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-number {% if question.is_answered %}text-success{% endif %}">
+                                                {{ question.answers_count }}
+                                            </span>
+                                            <span class="stat-label">answers</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-number text-muted">{{ question.views }}</span>
+                                            <span class="stat-label">views</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-8">
+                                    <h5 class="card-title">
+                                        <a href="{% url 'questions:question_detail' question.id %}" class="text-decoration-none">
+                                            {{ question.title }}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text text-muted">
+                                        {{ question.text|truncatewords:20 }}
+                                    </p>
+                                    
+                                    <div class="question-tags mb-2">
+                                        {% for tag in question.tags %}
+                                            <a href="{% url 'questions:tag' tag.name %}" 
+                                               class="badge bg-secondary text-decoration-none me-1">
+                                                {{ tag.name }}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="question-author text-end">
+                                        <small class="text-muted d-block">{{ question.created_at }}</small>
+                                        <div class="author-info mt-1">
+                                            <img src="{% static 'img/avatar.svg' %}" 
+                                                 alt="{{ question.author.username }}" 
+                                                 width="24" height="24" 
+                                                 class="rounded-circle me-1">
+                                            <small>
+                                                <strong>{{ question.author.username }}</strong>
+                                                <br>
+                                                <span class="text-muted">{{ question.author.rating }} pts</span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            {% include 'includes/paginator.html' with page=questions %}
+            
+        {% else %}
+            <div class="text-center py-5">
+                <h3 class="text-muted">No questions found</h3>
+                <p class="text-muted">Be the first to ask a question!</p>
+                <a href="{% url 'core:ask' %}" class="btn btn-primary">Ask Question</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

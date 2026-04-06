@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - media_volume:/app/media
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-docker-development-key-change-in-production
+    depends_on:
+      - db
+    command: python manage.py runserver 0.0.0.0:8000
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=eduweb
+      - POSTGRES_USER=eduweb
+      - POSTGRES_PASSWORD=eduweb123
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+  media_volume:
