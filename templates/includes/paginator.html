@@ -1,0 +1,48 @@
+{% if page.has_other_pages %}
+<nav aria-label="Page navigation" class="paginator-nav">
+    <ul class="pagination justify-content-center flex-wrap gap-1 mb-0">
+        {% if page.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page.previous_page_number }}" rel="prev" aria-label="Previous page">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Previous</span>
+            </li>
+        {% endif %}
+
+        {% for num in page_range %}
+            {% if num == '...' %}
+                <li class="page-item disabled">
+                    <span class="page-link border-0 bg-transparent">…</span>
+                </li>
+            {% elif num == page.number %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page.next_page_number }}" rel="next" aria-label="Next page">Next</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Next</span>
+            </li>
+        {% endif %}
+    </ul>
+
+    <div class="text-center text-muted mt-2">
+        <small>
+            Page {{ page.number }} of {{ page.paginator.num_pages }}
+            ({{ page.paginator.count }} total)
+        </small>
+    </div>
+</nav>
+{% endif %}
