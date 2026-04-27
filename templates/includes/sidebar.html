@@ -1,0 +1,44 @@
+{% load static %}
+<aside class="sidebar">
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header fw-semibold py-3">
+            Popular tags
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+                {% for tag in popular_tags %}
+                    <a href="{% url 'questions:tag' tag %}"
+                       class="badge rounded-pill bg-secondary text-decoration-none">
+                        {{ tag }}
+                    </a>
+                {% empty %}
+                    <p class="text-muted small mb-0">No tags yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header fw-semibold py-3">
+            Best members
+        </div>
+        <div class="card-body">
+            {% for member in best_members %}
+                <a href="{% url 'core:profile' %}"
+                   class="member-item d-flex align-items-center text-decoration-none text-body mb-2 {% if not forloop.last %}pb-2 border-bottom{% endif %}">
+                    <img src="{% static member.avatar %}"
+                         alt=""
+                         width="36"
+                         height="36"
+                         class="rounded-circle me-2 flex-shrink-0">
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="fw-medium text-truncate">{{ member.username }}</div>
+                        <small class="text-muted">{{ member.rating }} pts</small>
+                    </div>
+                </a>
+            {% empty %}
+                <p class="text-muted small mb-0">No members yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</aside>

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ question.title }} - EDU-Web{% endblock %}
+
+{% block content %}
+<section class="question-detail">
+    <article class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <aside class="col-auto">
+                    <div class="vote-widget d-flex flex-column align-items-center">
+                        <button type="button" class="vote-btn" title="Vote up" aria-label="Vote up">▲</button>
+                        <div class="vote-count">{{ question.votes }}</div>
+                        <button type="button" class="vote-btn" title="Vote down" aria-label="Vote down">▼</button>
+                        <button type="button" class="vote-btn mt-2" title="Bookmark" aria-label="Bookmark">⭐</button>
+                    </div>
+                </aside>
+
+                <div class="col">
+                    <h1 class="h3 mb-2">{{ question.title }}</h1>
+
+                    <p class="question-meta text-muted small mb-3">
+                        Asked {{ question.created_at }} ·
+                        Viewed {{ question.views }} times ·
+                        {% if question.is_answered %}
+                            <span class="text-success">Answered</span>
+                        {% else %}
+                            <span class="text-warning">Unanswered</span>
+                        {% endif %}
+                    </p>
+
+                    <div class="question-body mb-3">
+                        <p class="mb-0">{{ question.text|linebreaks }}</p>
+                        {% if question.code_snippet %}
+                            <pre class="question-code mt-3 mb-0" tabindex="0"><code>{{ question.code_snippet }}</code></pre>
+                        {% endif %}
+                    </div>
+
+                    <div class="question-tags mb-3">
+                        {% for tag in question.tags %}
+                            <a href="{% url 'questions:tag' tag.name %}"
+                               class="badge bg-secondary text-decoration-none me-1 mb-1">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-primary">Share</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Follow</button>
+                    </div>
+
+                    <footer class="question-author-footer d-flex align-items-center gap-2 pt-3 border-top">
+                        <img src="{% static question.author.avatar %}"
+                             alt=""
+                             width="40"
+                             height="40"
+                             class="rounded-circle flex-shrink-0">
+                        <div>
+                            <div class="fw-semibold">{{ question.author.username }}</div>
+                            <small class="text-muted">{{ question.author.rating }} reputation · asked {{ question.created_at }}</small>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <section class="answers-section" aria-labelledby="answers-heading">
+        <h2 id="answers-heading" class="h4 mb-3 d-flex flex-wrap align-items-baseline gap-2">
+            <span>{{ answers_count }} Answer{{ answers_count|pluralize }}</span>
+            {% if answers_count > 0 %}
+                <small class="text-muted fw-normal">(sorted by votes)</small>
+            {% endif %}
+        </h2>
+
+        {% if answers %}
+            {% for answer in answers %}
+                <article class="card mb-3 {% if answer.is_accepted %}border-success{% endif %}">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <aside class="col-auto">
+                                <div class="vote-widget d-flex flex-column align-items-center">
+                                    <button type="button" class="vote-btn" title="Vote up" aria-label="Vote up">▲</button>
+                                    <div class="vote-count">{{ answer.votes }}</div>
+                                    <button type="button" class="vote-btn" title="Vote down" aria-label="Vote down">▼</button>
+                                    {% if answer.is_accepted %}
+                                        <span class="text-success mt-2" title="Accepted answer" aria-label="Accepted">✓</span>
+                                    {% endif %}
+                                </div>
+                            </aside>
+
+                            <div class="col">
+                                {% if answer.is_accepted %}
+                                    <div class="alert alert-success py-2 px-3 small mb-3" role="status">
+                                        <strong>Accepted answer</strong>
+                                    </div>
+                                {% endif %}
+
+                                <div class="answer-body mb-3">
+                                    <p class="mb-0">{{ answer.text|linebreaks }}</p>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <button type="button" class="btn btn-sm btn-outline-primary">Share</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Follow</button>
+                                </div>
+
+                                <footer class="answer-author-footer d-flex align-items-center gap-2 pt-3 border-top">
+                                    <img src="{% static answer.author.avatar %}"
+                                         alt=""
+                                         width="40"
+                                         height="40"
+                                         class="rounded-circle flex-shrink-0">
+                                    <div>
+                                        <div class="fw-semibold">{{ answer.author.username }}</div>
+                                        <small class="text-muted">{{ answer.author.rating }} reputation · answered {{ answer.created_at }}</small>
+                                    </div>
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+
+            {% include 'includes/paginator.html' with page=answers %}
+
+        {% else %}
+            <p class="text-center text-muted py-4 mb-0">No answers yet. Be the first to answer!</p>
+        {% endif %}
+    </section>
+
+    <section class="answer-form mt-5" aria-labelledby="your-answer-heading">
+        <h2 id="your-answer-heading" class="h5">Your answer</h2>
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="answer_text" class="visually-hidden">Answer text</label>
+                <textarea class="form-control" id="answer_text" name="answer_text" rows="6"
+                          placeholder="Write your answer here..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post your answer</button>
+        </form>
+    </section>
+</section>
+{% endblock %}
