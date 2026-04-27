@@ -1,14 +1,36 @@
 .DS_Store
 
 __pycache__/
-*.pyc
-*.pyo
-*.sqlite3
+*.py[cod]
+*$py.class
+*.so
+.Python
 
 *.log
+*.sqlite3
+db.sqlite3
 
 .idea/
 .vscode/
+*.swp
+*.swo
 
 .env
+.env.local
 venv/
+.venv/
+env/
+ENV/
+
+media/
+staticfiles/
+
+*.egg-info/
+.eggs/
+dist/
+build/
+
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/

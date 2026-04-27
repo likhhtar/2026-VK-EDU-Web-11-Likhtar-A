@@ -1,0 +1,62 @@
+{% load static %}
+<div class="card mb-3 question-card">
+    <div class="card-body">
+        <div class="row g-3 align-items-start">
+            <div class="col-12 col-md-2 text-center">
+                <div class="question-card-stats d-flex flex-md-column justify-content-center justify-content-md-between align-items-center gap-2 gap-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ question.votes }}</span>
+                        <span class="stat-label">votes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number {% if question.is_answered %}text-success{% endif %}">
+                            {{ question.answers_count }}
+                        </span>
+                        <span class="stat-label">answers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number text-muted">{{ question.views }}</span>
+                        <span class="stat-label">views</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8">
+                <h5 class="card-title mb-2">
+                    <a href="{% url 'questions:question_detail' question.id %}" class="text-decoration-none clamp-title d-block">
+                        {{ question.title }}
+                    </a>
+                </h5>
+                <p class="card-text text-muted small mb-2 clamp-text">
+                    {{ question.text }}
+                </p>
+
+                <div class="question-tags">
+                    {% for tag in question.tags %}
+                        <a href="{% url 'questions:tag' tag.name %}"
+                           class="badge bg-secondary text-decoration-none me-1 mb-1">
+                            {{ tag.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-12 col-md-2">
+                <div class="question-author text-md-end border-top border-md-0 pt-2 pt-md-0">
+                    <small class="text-muted d-block">{{ question.created_at }}</small>
+                    <div class="d-flex d-md-block align-items-center justify-content-start justify-content-md-end mt-1 gap-2">
+                        <img src="{% static question.author.avatar %}"
+                             alt="{{ question.author.username }}"
+                             width="32"
+                             height="32"
+                             class="rounded-circle flex-shrink-0">
+                        <div class="small">
+                            <strong class="d-block">{{ question.author.username }}</strong>
+                            <span class="text-muted">{{ question.author.rating }} pts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
