@@ -5,28 +5,28 @@
 
 {% block content %}
 <section class="question-detail">
-    <article class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <aside class="col-auto">
-                    <div class="vote-widget d-flex flex-column align-items-center">
+    <article class="card mb-4 question-detail-card">
+        <div class="card-body question-detail__body">
+            <div class="d-flex flex-row align-items-start gap-2 gap-md-3 question-detail__layout">
+                <aside class="question-detail__vote flex-shrink-0" aria-label="Voting">
+                    <div class="vote-widget vote-widget--stack d-flex flex-column align-items-center">
                         <button type="button" class="vote-btn" title="Vote up" aria-label="Vote up">▲</button>
                         <div class="vote-count">{{ question.votes }}</div>
                         <button type="button" class="vote-btn" title="Vote down" aria-label="Vote down">▼</button>
-                        <button type="button" class="vote-btn mt-2" title="Bookmark" aria-label="Bookmark">⭐</button>
+                        <button type="button" class="vote-btn vote-btn--bookmark" title="Bookmark" aria-label="Bookmark">⭐</button>
                     </div>
                 </aside>
 
-                <div class="col">
+                <div class="question-detail__content flex-grow-1 min-w-0">
                     <h1 class="h3 mb-2">{{ question.title }}</h1>
 
                     <p class="question-meta text-muted small mb-3">
-                        Asked {{ question.created_at }} ·
-                        Viewed {{ question.views }} times ·
+                        Задан {{ question.created_at|date:"d.m.Y H:i" }} ·
+                        Просмотров: {{ question.views }} ·
                         {% if question.is_answered %}
-                            <span class="text-success">Answered</span>
+                            <span class="text-success">Есть принятый ответ</span>
                         {% else %}
-                            <span class="text-warning">Unanswered</span>
+                            <span class="text-warning">Нет принятого ответа</span>
                         {% endif %}
                     </p>
 
@@ -38,9 +38,11 @@
                     </div>
 
                     <div class="question-tags mb-3">
-                        {% for tag in question.tags %}
+                        {% for tag in question.tags.all %}
                             <a href="{% url 'questions:tag' tag.name %}"
                                class="badge bg-secondary text-decoration-none me-1 mb-1">{{ tag.name }}</a>
+                        {% empty %}
+                            <span class="text-muted small">Теги не указаны</span>
                         {% endfor %}
                     </div>
 
@@ -51,14 +53,22 @@
                     </div>
 
                     <footer class="question-author-footer d-flex align-items-center gap-2 pt-3 border-top">
-                        <img src="{% static question.author.avatar %}"
-                             alt=""
-                             width="40"
-                             height="40"
-                             class="rounded-circle flex-shrink-0">
+                        {% if question.author.profile.avatar and question.author.profile.avatar.name %}
+                            <img src="{{ question.author.profile.avatar.url }}"
+                                 alt=""
+                                 width="40"
+                                 height="40"
+                                 class="rounded-circle flex-shrink-0">
+                        {% else %}
+                            <img src="{% static 'img/avatar.svg' %}"
+                                 alt=""
+                                 width="40"
+                                 height="40"
+                                 class="rounded-circle flex-shrink-0">
+                        {% endif %}
                         <div>
                             <div class="fw-semibold">{{ question.author.username }}</div>
-                            <small class="text-muted">{{ question.author.rating }} reputation · asked {{ question.created_at }}</small>
+                            <small class="text-muted">{{ question.author.profile.rating }} репутация · задан {{ question.created_at|date:"d.m.Y" }}</small>
                         </div>
                     </footer>
                 </div>
@@ -68,32 +78,32 @@
 
     <section class="answers-section" aria-labelledby="answers-heading">
         <h2 id="answers-heading" class="h4 mb-3 d-flex flex-wrap align-items-baseline gap-2">
-            <span>{{ answers_count }} Answer{{ answers_count|pluralize }}</span>
-            {% if answers_count > 0 %}
-                <small class="text-muted fw-normal">(sorted by votes)</small>
+            <span>Ответы: {{ question.answers_count }}</span>
+            {% if question.answers_count %}
+                <small class="text-muted fw-normal">(сортировка по голосам)</small>
             {% endif %}
         </h2>
 
-        {% if answers %}
+        {% if answers.object_list %}
             {% for answer in answers %}
-                <article class="card mb-3 {% if answer.is_accepted %}border-success{% endif %}">
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <aside class="col-auto">
-                                <div class="vote-widget d-flex flex-column align-items-center">
+                <article class="card mb-3 answer-detail-card {% if answer.is_accepted %}border-success{% endif %}">
+                    <div class="card-body answer-detail__body">
+                        <div class="d-flex flex-row align-items-start gap-2 gap-md-3 answer-detail__layout">
+                            <aside class="answer-detail__vote flex-shrink-0" aria-label="Voting">
+                                <div class="vote-widget vote-widget--stack d-flex flex-column align-items-center">
                                     <button type="button" class="vote-btn" title="Vote up" aria-label="Vote up">▲</button>
                                     <div class="vote-count">{{ answer.votes }}</div>
                                     <button type="button" class="vote-btn" title="Vote down" aria-label="Vote down">▼</button>
                                     {% if answer.is_accepted %}
-                                        <span class="text-success mt-2" title="Accepted answer" aria-label="Accepted">✓</span>
+                                        <span class="text-success answer-accepted-glyph" title="Accepted answer" aria-label="Accepted">✓</span>
                                     {% endif %}
                                 </div>
                             </aside>
 
-                            <div class="col">
+                            <div class="answer-detail__content flex-grow-1 min-w-0">
                                 {% if answer.is_accepted %}
                                     <div class="alert alert-success py-2 px-3 small mb-3" role="status">
-                                        <strong>Accepted answer</strong>
+                                        <strong>Принятый ответ</strong>
                                     </div>
                                 {% endif %}
 
@@ -108,14 +118,22 @@
                                 </div>
 
                                 <footer class="answer-author-footer d-flex align-items-center gap-2 pt-3 border-top">
-                                    <img src="{% static answer.author.avatar %}"
-                                         alt=""
-                                         width="40"
-                                         height="40"
-                                         class="rounded-circle flex-shrink-0">
+                                    {% if answer.author.profile.avatar and answer.author.profile.avatar.name %}
+                                        <img src="{{ answer.author.profile.avatar.url }}"
+                                             alt=""
+                                             width="40"
+                                             height="40"
+                                             class="rounded-circle flex-shrink-0">
+                                    {% else %}
+                                        <img src="{% static 'img/avatar.svg' %}"
+                                             alt=""
+                                             width="40"
+                                             height="40"
+                                             class="rounded-circle flex-shrink-0">
+                                    {% endif %}
                                     <div>
                                         <div class="fw-semibold">{{ answer.author.username }}</div>
-                                        <small class="text-muted">{{ answer.author.rating }} reputation · answered {{ answer.created_at }}</small>
+                                        <small class="text-muted">{{ answer.author.profile.rating }} репутация · {{ answer.created_at|date:"d.m.Y" }}</small>
                                     </div>
                                 </footer>
                             </div>
@@ -125,22 +143,21 @@
             {% endfor %}
 
             {% include 'includes/paginator.html' with page=answers %}
-
         {% else %}
-            <p class="text-center text-muted py-4 mb-0">No answers yet. Be the first to answer!</p>
+            <p class="text-center text-muted py-4 mb-0">Пока нет ни одного ответа к этому вопросу. Будьте первыми.</p>
         {% endif %}
     </section>
 
     <section class="answer-form mt-5" aria-labelledby="your-answer-heading">
-        <h2 id="your-answer-heading" class="h5">Your answer</h2>
+        <h2 id="your-answer-heading" class="h5">Ваш ответ</h2>
         <form method="post" class="mt-3">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="answer_text" class="visually-hidden">Answer text</label>
+                <label for="answer_text" class="visually-hidden">Текст ответа</label>
                 <textarea class="form-control" id="answer_text" name="answer_text" rows="6"
-                          placeholder="Write your answer here..." required></textarea>
+                          placeholder="Напишите ответ здесь..." required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Post your answer</button>
+            <button type="submit" class="btn btn-primary">Опубликовать ответ</button>
         </form>
     </section>
 </section>

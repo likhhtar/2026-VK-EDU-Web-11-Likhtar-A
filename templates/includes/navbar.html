@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
         <a class="navbar-brand fw-bold" href="{% url 'questions:index' %}">
-            <img src="{% static 'img/logo.svg' %}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
+            <span class="fs-4 me-2">🎓</span>
             EDU-Web
         </a>
         
@@ -65,7 +65,7 @@
 <div class="offcanvas offcanvas-end h-100" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
     <div class="offcanvas-header bg-primary text-white">
         <h5 class="offcanvas-title" id="mobileMenuLabel">
-            <img src="{% static 'img/logo.svg' %}" alt="Logo" width="24" height="24" class="me-2">
+            <span class="fs-5 me-2">🎓</span>
             EDU-Web
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -107,8 +107,12 @@
                 <h6 class="text-muted mb-2">Best Members</h6>
                 {% for member in best_members %}
                     <div class="d-flex align-items-center mb-2">
-                        <img src="{% static member.avatar %}" alt="{{ member.username }}" width="24" height="24" class="rounded-circle me-2">
-                        <span class="me-auto">{{ member.username }}</span>
+                        {% if member.avatar and member.avatar.name %}
+                            <img src="{{ member.avatar.url }}" alt="{{ member.user.username }}" width="24" height="24" class="rounded-circle me-2">
+                        {% else %}
+                            <img src="{% static 'img/avatar.svg' %}" alt="{{ member.user.username }}" width="24" height="24" class="rounded-circle me-2">
+                        {% endif %}
+                        <span class="me-auto">{{ member.user.username }}</span>
                         <small class="text-muted">{{ member.rating }}</small>
                     </div>
                 {% endfor %}

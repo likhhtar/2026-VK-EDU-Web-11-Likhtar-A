@@ -1,108 +1,70 @@
-from django.shortcuts import render, redirect
-from django.http import Http404
-from django.contrib import messages
-from core.utils import paginate, get_page_range
-from core.mock_data import (
-    MOCK_QUESTIONS,
-    get_questions_by_tag,
-    get_question_by_id,
-    get_answers_for_question,
-    get_hot_questions
-)
+from django.shortcuts import get_object_or_404, render
+
+from core.utils import get_page_range, paginate_or_404
+from .models import Question, Tag
 
 
 def index_view(request):
-    questions = sorted(MOCK_QUESTIONS, key=lambda q: q['id'], reverse=True)
-
-    page = paginate(questions, request, per_page=10)
-    page_range = get_page_range(page)
-
-    context = {
-        'questions': page,
-        'page_range': page_range,
-        'page_title': 'New Questions',
-        'active_tab': 'new'
-    }
-
-    return render(request, 'questions/index.html', context)
+    page = paginate_or_404(Question.objects.new_questions(), request, per_page=10)
+    return render(
+        request,
+        'questions/index.html',
+        {
+            'questions': page,
+            'page_range': get_page_range(page),
+            'page_title': 'Новые вопросы',
+            'active_tab': 'new',
+        },
+    )
 
 
 def hot_view(request):
-    questions = get_hot_questions()
-
-    page = paginate(questions, request, per_page=10)
-    page_range = get_page_range(page)
-
-    context = {
-        'questions': page,
-        'page_range': page_range,
-        'page_title': 'Hot Questions',
-        'active_tab': 'hot'
-    }
-
-    return render(request, 'questions/hot.html', context)
+    page = paginate_or_404(Question.objects.best_questions(), request, per_page=10)
+    return render(
+        request,
+        'questions/hot.html',
+        {
+            'questions': page,
+            'page_range': get_page_range(page),
+            'page_title': 'Лучшие вопросы',
+            'active_tab': 'hot',
+        },
+    )
 
 
 def ask_view(request):
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        text = request.POST.get('text')
-        tags = request.POST.get('tags')
-
-        if title and text:
-            messages.success(request, 'Your question has been posted successfully!')
-            return redirect('questions:index')
-        else:
-            messages.error(request, 'Title and description are required.')
-
-    context = {
-        'available_tags': [
-            'python', 'django', 'javascript', 'react', 'css', 'html', 'sql', 'git'
-        ]
-    }
-
-    return render(request, 'questions/ask.html', context)
+    return render(request, 'questions/ask.html', {'available_tags': Tag.name_suggestions_for_ask()})
 
 
 def tag_view(request, tag):
-    questions = get_questions_by_tag(tag)
-
-    if not questions:
-        questions = []
-
-    page = paginate(questions, request, per_page=10)
-    page_range = get_page_range(page)
-
-    context = {
-        'questions': page,
-        'page_range': page_range,
-        'tag': tag,
-        'page_title': f'Questions tagged "{tag}"',
-        'active_tab': 'tag'
-    }
-
-    return render(request, 'questions/tag.html', context)
+    tag_obj = get_object_or_404(Tag, name__iexact=tag)
+    page = paginate_or_404(
+        Question.objects.for_tag(tag_obj),
+        request,
+        per_page=10,
+    )
+    return render(
+        request,
+        'questions/tag.html',
+        {
+            'questions': page,
+            'page_range': get_page_range(page),
+            'tag': tag_obj,
+            'page_title': f'Вопросы с тегом «{tag_obj.name}»',
+            'active_tab': 'tag',
+        },
+    )
 
 
 def question_detail_view(request, question_id):
-    question = get_question_by_id(question_id)
-
-    if not question:
-        raise Http404("Question not found")
-
-    answers = get_answers_for_question(question_id)
-
-    answers = sorted(answers, key=lambda a: (a['is_accepted'], a['votes']), reverse=True)
-
-    answers_page = paginate(answers, request, per_page=5)
-    page_range = get_page_range(answers_page)
-
-    context = {
-        'question': question,
-        'answers': answers_page,
-        'page_range': page_range,
-        'answers_count': len(answers),
-        'page_title': question['title']
-    }
-
-    return render(request, 'questions/question.html', context)
+    question = Question.objects.get_for_detail_or_404(question_id)
+    answers = paginate_or_404(question.get_answers_queryset(), request, per_page=5)
+    return render(
+        request,
+        'questions/question.html',
+        {
+            'question': question,
+            'answers': answers,
+            'page_range': get_page_range(answers),
+        },
+    )

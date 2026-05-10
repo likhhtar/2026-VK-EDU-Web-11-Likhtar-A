@@ -1,26 +1,20 @@
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import EmptyPage, Paginator
+from django.http import Http404
 
 
-def paginate(objects_list, request, per_page=10):
-    paginator = Paginator(objects_list, per_page)
+def paginate_or_404(objects_list, request, per_page=10):
     raw = request.GET.get('page', '1')
-
     try:
         page_number = int(raw)
     except (TypeError, ValueError):
-        page_number = 1
-
+        raise Http404
     if page_number < 1:
-        page_number = 1
-
-    last = paginator.num_pages
-    if last >= 1 and page_number > last:
-        page_number = last
-
+        raise Http404
+    paginator = Paginator(objects_list, per_page)
     try:
         return paginator.page(page_number)
     except EmptyPage:
-        return paginator.page(last) if last >= 1 else paginator.page(1)
+        raise Http404
 
 
 def get_page_range(page):

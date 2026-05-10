@@ -112,6 +112,14 @@ body {
     margin-right: 15px;
 }
 
+.vote-widget--stack {
+    margin-right: 0;
+}
+
+.vote-btn--bookmark {
+    margin-top: 0.35rem;
+}
+
 .vote-btn {
     background: none;
     border: none;
@@ -136,16 +144,25 @@ body {
 }
 
 @media (max-width: 768px) {
-    .vote-widget {
-        flex-direction: row;
-        justify-content: center;
+    /* Detail pages: keep vertical vote strip beside content; no full-width "air gap" */
+    .question-detail__vote .vote-widget--stack,
+    .answer-detail__vote .vote-widget--stack {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 0;
         margin-right: 0;
-        margin-bottom: 15px;
-        gap: 15px;
+        gap: 0.2rem;
     }
-    
-    .vote-widget .vote-count {
-        margin: 0;
+
+    .question-detail__body,
+    .answer-detail__body {
+        padding-top: 0.75rem;
+    }
+
+    .question-detail__content > .h3,
+    .question-detail__content h1 {
+        margin-top: 0;
     }
 }
 
@@ -366,8 +383,13 @@ body {
         font-size: 0.875rem;
     }
     
-    .vote-widget {
-        gap: 10px;
+    .question-detail__vote .vote-widget--stack,
+    .answer-detail__vote .vote-widget--stack {
+        gap: 0.12rem;
+    }
+
+    .vote-btn--bookmark {
+        margin-top: 0.25rem;
     }
     
     .vote-btn {
@@ -515,7 +537,49 @@ pre code {
     object-fit: cover;
 }
 
+.paginator-nav {
+    --paginator-ellipsis-min: 1.75rem;
+}
+
 .paginator-nav .page-link {
     min-width: 2.5rem;
     text-align: center;
+    white-space: nowrap;
+}
+
+.paginator-nav__ellipsis .page-link {
+    min-width: var(--paginator-ellipsis-min);
+    pointer-events: none;
+}
+
+.paginator-nav .page-item.disabled .page-link,
+.paginator-nav .page-item.disabled .page-link .paginator-nav__chevron {
+    pointer-events: none;
+    user-select: none;
+}
+
+.paginator-nav .page-item.paginator-nav__step.disabled .page-link {
+    background-color: #f8f9fa;
+    color: #adb5bd;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+}
+
+.question-detail__layout,
+.answer-detail__layout {
+    min-width: 0;
+}
+
+.answer-accepted-glyph {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+@media (min-width: 768px) {
+    .question-detail__vote,
+    .answer-detail__vote {
+        padding-top: 0.1rem;
+    }
 }

@@ -1,48 +1,65 @@
 {% if page.has_other_pages %}
-<nav aria-label="Page navigation" class="paginator-nav">
-    <ul class="pagination justify-content-center flex-wrap gap-1 mb-0">
-        {% if page.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page.previous_page_number }}" rel="prev" aria-label="Previous page">Previous</a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">Previous</span>
-            </li>
-        {% endif %}
+<nav class="paginator-nav" aria-label="Page navigation">
+    <ul class="pagination justify-content-center flex-wrap align-items-center gap-1 mb-2 mb-md-2">
+        <li class="page-item paginator-nav__step {% if not page.has_previous %}disabled{% endif %}">
+            {% if page.has_previous %}
+                <a class="page-link d-inline-flex align-items-center gap-1 px-3"
+                   href="?page={{ page.previous_page_number }}"
+                   rel="prev"
+                   aria-label="Go to previous page">
+                    <span class="paginator-nav__chevron" aria-hidden="true">←</span>
+                    <span>Previous</span>
+                </a>
+            {% else %}
+                <span class="page-link d-inline-flex align-items-center gap-1 px-3 text-muted"
+                      aria-disabled="true"
+                      tabindex="-1">
+                    <span class="paginator-nav__chevron" aria-hidden="true">←</span>
+                    <span>Previous</span>
+                </span>
+            {% endif %}
+        </li>
 
         {% for num in page_range %}
             {% if num == '...' %}
-                <li class="page-item disabled">
+                <li class="page-item disabled paginator-nav__ellipsis" aria-hidden="true">
                     <span class="page-link border-0 bg-transparent">…</span>
                 </li>
             {% elif num == page.number %}
-                <li class="page-item active" aria-current="page">
+                <li class="page-item active paginator-nav__num" aria-current="page">
                     <span class="page-link">{{ num }}</span>
                 </li>
             {% else %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                <li class="page-item paginator-nav__num">
+                    <a class="page-link" href="?page={{ num }}" aria-label="Go to page {{ num }}">{{ num }}</a>
                 </li>
             {% endif %}
         {% endfor %}
 
-        {% if page.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page.next_page_number }}" rel="next" aria-label="Next page">Next</a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">Next</span>
-            </li>
-        {% endif %}
+        <li class="page-item paginator-nav__step {% if not page.has_next %}disabled{% endif %}">
+            {% if page.has_next %}
+                <a class="page-link d-inline-flex align-items-center gap-1 px-3"
+                   href="?page={{ page.next_page_number }}"
+                   rel="next"
+                   aria-label="Go to next page">
+                    <span>Next</span>
+                    <span class="paginator-nav__chevron" aria-hidden="true">→</span>
+                </a>
+            {% else %}
+                <span class="page-link d-inline-flex align-items-center gap-1 px-3 text-muted"
+                      aria-disabled="true"
+                      tabindex="-1">
+                    <span>Next</span>
+                    <span class="paginator-nav__chevron" aria-hidden="true">→</span>
+                </span>
+            {% endif %}
+        </li>
     </ul>
 
-    <div class="text-center text-muted mt-2">
-        <small>
-            Page {{ page.number }} of {{ page.paginator.num_pages }}
-            ({{ page.paginator.count }} total)
-        </small>
-    </div>
+    <p class="text-center text-muted small mb-0" role="status">
+        Page <strong class="text-body">{{ page.number }}</strong> of
+        <strong class="text-body">{{ page.paginator.num_pages }}</strong>
+        <span class="d-none d-sm-inline">· {{ page.paginator.count }} total</span>
+    </p>
 </nav>
 {% endif %}
