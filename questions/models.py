@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Count
 from django.urls import reverse
 
+from core.models import DefaultModel
 from .managers import AnswerManager, QuestionManager
 
 
@@ -13,7 +14,6 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'тег'
         verbose_name_plural = 'теги'
-        db_table = 'questions_tag'
         ordering = ['name']
 
     def __str__(self):
@@ -27,7 +27,7 @@ class Tag(models.Model):
         return list(cls.objects.order_by('name').values_list('name', flat=True)[:limit])
 
 
-class Question(models.Model):
+class Question(DefaultModel):
     title = models.CharField(max_length=255, verbose_name='заголовок')
     text = models.TextField(verbose_name='текст')
     code_snippet = models.TextField(blank=True, default='', verbose_name='фрагмент кода')
@@ -37,17 +37,18 @@ class Question(models.Model):
         related_name='questions',
         verbose_name='автор',
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='создан')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='обновлён')
     views = models.PositiveIntegerField(default=0, verbose_name='просмотры')
     tags = models.ManyToManyField(Tag, related_name='questions', blank=True, verbose_name='теги')
+    
+    votes = models.IntegerField(default=0, verbose_name='рейтинг')
+    is_answered = models.BooleanField(default=False, verbose_name='имеет принятый ответ')
+    answers_cnt = models.PositiveIntegerField(default=0, verbose_name='количество ответов')
 
     objects = QuestionManager()
 
     class Meta:
         verbose_name = 'вопрос'
         verbose_name_plural = 'вопросы'
-        db_table = 'questions_question'
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['-created_at']),
@@ -61,14 +62,30 @@ class Question(models.Model):
 
     def get_answers_queryset(self):
         return (
-            Answer.objects.filter(question_id=self.pk)
+            Answer.objects.filter(question_id=self.pk, is_active=True)
             .select_related('author', 'author__profile')
-            .annotate(votes=Count('answer_likes', distinct=True))
-            .order_by('-is_accepted', '-votes', 'created_at', 'id')
+            .order_by('-is_accepted', 'created_at', 'id')
         )
 
+    def sync_answer_cnt(self):
+        answer_cnt = Answer.objects.filter(question_id=self.pk, is_active=True).count()
+        self.answers_cnt = answer_cnt
+        self.save(update_fields=["answers_cnt"])
 
-class Answer(models.Model):
+    def sync_has_accepted_answer(self):
+        has_accepted_answer = Answer.objects.filter(
+            question_id=self.pk, is_active=True, is_accepted=True
+        ).exists()
+        self.is_answered = has_accepted_answer
+        self.save(update_fields=["is_answered"])
+
+    def sync_votes(self):
+        votes_count = QuestionLike.objects.filter(question_id=self.pk).count()
+        self.votes = votes_count
+        self.save(update_fields=["votes"])
+
+
+class Answer(DefaultModel):
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
@@ -83,15 +100,14 @@ class Answer(models.Model):
     )
     text = models.TextField(verbose_name='текст')
     is_accepted = models.BooleanField(default=False, verbose_name='принят')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='создан')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='обновлён')
+    
+    votes = models.IntegerField(default=0, verbose_name='рейтинг')
 
     objects = AnswerManager()
 
     class Meta:
         verbose_name = 'ответ'
         verbose_name_plural = 'ответы'
-        db_table = 'questions_answer'
         ordering = ['-is_accepted', '-created_at']
         indexes = [
             models.Index(fields=['question', '-is_accepted', '-created_at']),
@@ -104,19 +120,29 @@ class Answer(models.Model):
             ),
         ]
 
-    def save(self, *args, **kwargs):
-        if self.is_accepted and self.question_id:
-            qs = type(self).objects.filter(question_id=self.question_id, is_accepted=True)
-            if self.pk:
-                qs = qs.exclude(pk=self.pk)
-            qs.update(is_accepted=False)
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f'Answer #{self.pk} to Q{self.question_id}'
 
+    def accept_answer(self):
+        if self.question_id:
+            Answer.objects.filter(
+                question_id=self.question_id,
+                is_accepted=True,
+                is_active=True
+            ).exclude(pk=self.pk).update(is_accepted=False)
+            
+            self.is_accepted = True
+            self.save(update_fields=['is_accepted'])
+            
+            self.question.sync_has_accepted_answer()
 
-class QuestionLike(models.Model):
+    def sync_votes(self):
+        votes_count = AnswerLike.objects.filter(answer_id=self.pk).count()
+        self.votes = votes_count
+        self.save(update_fields=["votes"])
+
+
+class QuestionLike(DefaultModel):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -129,12 +155,10 @@ class QuestionLike(models.Model):
         related_name='question_likes',
         verbose_name='вопрос',
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='создан')
 
     class Meta:
         verbose_name = 'лайк вопроса'
         verbose_name_plural = 'лайки вопросов'
-        db_table = 'questions_questionlike'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'question'],
@@ -143,10 +167,10 @@ class QuestionLike(models.Model):
         ]
 
     def __str__(self):
-        return f'QLike u{self.user_id} q{self.question_id}'
+        return f'Лайк вопроса #{self.question_id} от пользователя #{self.user_id}'
 
 
-class AnswerLike(models.Model):
+class AnswerLike(DefaultModel):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -159,12 +183,10 @@ class AnswerLike(models.Model):
         related_name='answer_likes',
         verbose_name='ответ',
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='создан')
 
     class Meta:
         verbose_name = 'лайк ответа'
         verbose_name_plural = 'лайки ответов'
-        db_table = 'questions_answerlike'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'answer'],
@@ -173,4 +195,4 @@ class AnswerLike(models.Model):
         ]
 
     def __str__(self):
-        return f'ALike u{self.user_id} a{self.answer_id}'
+        return f'Лайк ответа #{self.answer_id} от пользователя #{self.user_id}'
