@@ -8,7 +8,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-body text-center">
-                <img src="{% static user.avatar %}"
+                <img src="{{ user.profile.get_avatar }}"
                      alt="{{ user.username }}"
                      width="120" height="120"
                      class="rounded-circle mb-3">
@@ -20,19 +20,19 @@
                     <div class="row text-center">
                         <div class="col-4">
                             <div class="stat-item">
-                                <h5 class="text-primary">{{ user.rating }}</h5>
+                                <h5 class="text-primary">{{ user.profile.rating }}</h5>
                                 <small class="text-muted">Reputation</small>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-item">
-                                <h5 class="text-success">{{ user.questions_count }}</h5>
+                                <h5 class="text-success">{{ user.questions.count }}</h5>
                                 <small class="text-muted">Questions</small>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-item">
-                                <h5 class="text-info">{{ user.answers_count }}</h5>
+                                <h5 class="text-info">{{ user.answers.count }}</h5>
                                 <small class="text-muted">Answers</small>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                                 <span class="profile-tab-stats__lbl">votes</span>
                                             </div>
                                             <div class="profile-tab-stats__item">
-                                                <span class="profile-tab-stats__num text-success">{{ question.answers }}</span>
+                                                <span class="profile-tab-stats__num text-success">{{ question.answers_cnt }}</span>
                                                 <span class="profile-tab-stats__lbl">answers</span>
                                             </div>
                                         </div>
@@ -133,7 +133,7 @@
                                                 <span class="profile-tab-stats__num">{{ answer.votes }}</span>
                                                 <span class="profile-tab-stats__lbl">votes</span>
                                             </div>
-                                            {% if answer.accepted %}
+                                            {% if answer.is_accepted %}
                                                 <div class="profile-tab-stats__item">
                                                     <span class="profile-tab-stats__num text-success" aria-hidden="true">✓</span>
                                                     <span class="profile-tab-stats__lbl">accepted</span>

@@ -12,7 +12,7 @@
                         {{ tag }}
                     </a>
                 {% empty %}
-                    <p class="text-muted small mb-0">No tags yet.</p>
+                    <p class="text-muted small mb-0">Пока нет тегов.</p>
                 {% endfor %}
             </div>
         </div>
@@ -26,18 +26,26 @@
             {% for member in best_members %}
                 <a href="{% url 'core:profile' %}"
                    class="member-item d-flex align-items-center text-decoration-none text-body mb-2 {% if not forloop.last %}pb-2 border-bottom{% endif %}">
-                    <img src="{% static member.avatar %}"
-                         alt=""
-                         width="36"
-                         height="36"
-                         class="rounded-circle me-2 flex-shrink-0">
+                    {% if member.avatar and member.avatar.name %}
+                        <img src="{{ member.avatar.url }}"
+                             alt=""
+                             width="36"
+                             height="36"
+                             class="rounded-circle me-2 flex-shrink-0">
+                    {% else %}
+                        <img src="{% static 'img/avatar.svg' %}"
+                             alt=""
+                             width="36"
+                             height="36"
+                             class="rounded-circle me-2 flex-shrink-0">
+                    {% endif %}
                     <div class="flex-grow-1 min-w-0">
-                        <div class="fw-medium text-truncate">{{ member.username }}</div>
+                        <div class="fw-medium text-truncate">{{ member.user.username }}</div>
                         <small class="text-muted">{{ member.rating }} pts</small>
                     </div>
                 </a>
             {% empty %}
-                <p class="text-muted small mb-0">No members yet.</p>
+                <p class="text-muted small mb-0">Пока нет участников с рейтингом.</p>
             {% endfor %}
         </div>
     </div>
