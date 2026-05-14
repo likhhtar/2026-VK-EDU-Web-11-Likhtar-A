@@ -1,81 +1,45 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sign Up - EDU-Web{% endblock %}
+{% block title %}Регистрация — EDU-Web{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
+    <div class="col-md-7 col-lg-6">
         <div class="card">
             <div class="card-header text-center">
-                <h3>Create Account</h3>
+                <h3 class="mb-0">Регистрация</h3>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" novalidate>
                     {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                        <div class="form-text">Choose a unique username (3-20 characters)</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                        <div class="form-text">We'll never share your email with anyone else</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="first_name" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="last_name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="last_name" name="last_name">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <div class="form-text">Password must be at least 8 characters long</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password_confirm" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
-                    </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="terms" required>
-                        <label class="form-check-label" for="terms">
-                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
-                            and <a href="#" class="text-decoration-none">Privacy Policy</a>
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% include 'includes/form_field.html' with field=form.username %}
+                    {% include 'includes/form_field.html' with field=form.email %}
+                    {% include 'includes/form_field.html' with field=form.first_name %}
+                    {% include 'includes/form_field.html' with field=form.last_name %}
+                    {% include 'includes/form_field.html' with field=form.password1 %}
+                    {% include 'includes/form_field.html' with field=form.password2 %}
+
+                    <button type="submit" class="btn btn-primary w-100">Создать аккаунт</button>
                 </form>
-                
+
                 <hr>
-                
+
                 <div class="text-center">
-                    <p class="mb-0">Already have an account?</p>
-                    <a href="{% url 'core:login' %}" class="btn btn-outline-secondary">Login</a>
+                    <p class="mb-2">Уже зарегистрированы?</p>
+                    <a href="{% url 'core:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}"
+                       class="btn btn-outline-secondary">Войти</a>
                 </div>
-            </div>
-        </div>
-        
-        <div class="card mt-3">
-            <div class="card-body">
-                <h6>Join EDU-Web and:</h6>
-                <ul class="list-unstyled mb-0">
-                    <li>✓ Ask unlimited questions</li>
-                    <li>✓ Answer and help others</li>
-                    <li>✓ Build your reputation</li>
-                    <li>✓ Get personalized recommendations</li>
-                </ul>
             </div>
         </div>
     </div>
