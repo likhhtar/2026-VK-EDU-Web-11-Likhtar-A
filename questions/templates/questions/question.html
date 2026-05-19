@@ -136,7 +136,7 @@
     {% if user.is_authenticated %}
         <section class="answer-form mt-5" aria-labelledby="your-answer-heading">
             <h2 id="your-answer-heading" class="h5">Ваш ответ</h2>
-            <form method="post" class="mt-3" novalidate>
+            <form method="post" action="{% url 'questions:question_detail' question.pk %}" class="mt-3" novalidate>
                 {% csrf_token %}
 
                 {% if answer_form.non_field_errors %}

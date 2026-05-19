@@ -79,21 +79,21 @@ class SignupForm(forms.ModelForm):
             raise ValidationError('Пользователь с таким email уже существует.')
         return email
 
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        if password1:
+            try:
+                password_validation.validate_password(password1, self.instance)
+            except ValidationError as error:
+                raise ValidationError(error)
+        return password1
+
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
         if password1 and password2 and password1 != password2:
             raise ValidationError('Пароли не совпадают.')
         return password2
-
-    def _post_clean(self):
-        super()._post_clean()
-        password = self.cleaned_data.get('password1')
-        if password:
-            try:
-                password_validation.validate_password(password, self.instance)
-            except ValidationError as error:
-                self.add_error('password1', error)
 
     @transaction.atomic
     def save(self, commit: bool = True):

@@ -40,7 +40,7 @@
                 <h3 class="mb-0 h5">Редактирование профиля</h3>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data" novalidate>
+                <form method="post" action="{% url 'core:profile' %}" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
 
                     {% if form.non_field_errors %}
