@@ -1,204 +1,65 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ user.username }}'s Profile - EDU-Web{% endblock %}
+{% block title %}Профиль {{ user.username }} — EDU-Web{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row g-4">
     <div class="col-md-4">
         <div class="card">
             <div class="card-body text-center">
-                <img src="{{ user.profile.get_avatar }}"
+                <img src="{{ profile.get_avatar }}"
                      alt="{{ user.username }}"
                      width="120" height="120"
-                     class="rounded-circle mb-3">
-                
-                <h4>{{ user.first_name }} {{ user.last_name }}</h4>
-                <p class="text-muted">@{{ user.username }}</p>
-                
-                <div class="user-stats mb-3">
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="stat-item">
-                                <h5 class="text-primary">{{ user.profile.rating }}</h5>
-                                <small class="text-muted">Reputation</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat-item">
-                                <h5 class="text-success">{{ user.questions.count }}</h5>
-                                <small class="text-muted">Questions</small>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="stat-item">
-                                <h5 class="text-info">{{ user.answers.count }}</h5>
-                                <small class="text-muted">Answers</small>
-                            </div>
-                        </div>
+                     class="rounded-circle mb-3 object-fit-cover">
+
+                <h4 class="mb-1">{{ user.first_name }} {{ user.last_name }}</h4>
+                <p class="text-muted mb-3">@{{ user.username }}</p>
+
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h5 class="text-primary mb-0">{{ profile.rating }}</h5>
+                        <small class="text-muted">Репутация</small>
                     </div>
-                </div>
-                
-                <button class="btn btn-primary btn-sm me-2">Edit Profile</button>
-                <button class="btn btn-outline-secondary btn-sm">Settings</button>
-            </div>
-        </div>
-        
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6 class="mb-0">Badges</h6>
-            </div>
-            <div class="card-body">
-                <div class="badges">
-                    <span class="badge bg-warning me-1 mb-1">🥉 Bronze</span>
-                    <span class="badge bg-secondary me-1 mb-1">📚 Student</span>
-                    <span class="badge bg-info me-1 mb-1">💬 Commentator</span>
-                    <span class="badge bg-success me-1 mb-1">✅ Supporter</span>
+                    <div class="col-4">
+                        <h5 class="text-success mb-0">{{ user.questions.count }}</h5>
+                        <small class="text-muted">Вопросы</small>
+                    </div>
+                    <div class="col-4">
+                        <h5 class="text-info mb-0">{{ user.answers.count }}</h5>
+                        <small class="text-muted">Ответы</small>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-8">
-        <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="questions-tab" data-bs-toggle="tab" 
-                        data-bs-target="#questions" type="button" role="tab">
-                    Questions ({{ user_questions|length }})
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="answers-tab" data-bs-toggle="tab" 
-                        data-bs-target="#answers" type="button" role="tab">
-                    Answers ({{ user_answers|length }})
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" 
-                        data-bs-target="#activity" type="button" role="tab">
-                    Activity
-                </button>
-            </li>
-        </ul>
-        
-        <div class="tab-content" id="profileTabsContent">
-            <div class="tab-pane fade show active" id="questions" role="tabpanel">
-                {% if user_questions %}
-                    {% for question in user_questions %}
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-md-2 text-center">
-                                        <div class="profile-tab-stats">
-                                            <div class="profile-tab-stats__item">
-                                                <span class="profile-tab-stats__num">{{ question.votes }}</span>
-                                                <span class="profile-tab-stats__lbl">votes</span>
-                                            </div>
-                                            <div class="profile-tab-stats__item">
-                                                <span class="profile-tab-stats__num text-success">{{ question.answers_cnt }}</span>
-                                                <span class="profile-tab-stats__lbl">answers</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <h6>
-                                            <a href="{% url 'questions:question_detail' question.id %}" 
-                                               class="text-decoration-none">
-                                                {{ question.title }}
-                                            </a>
-                                        </h6>
-                                        <small class="text-muted">Asked 2 days ago</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center py-4">
-                        <p class="text-muted">No questions asked yet.</p>
-                        <a href="{% url 'questions:ask' %}" class="btn btn-primary">Ask Your First Question</a>
-                    </div>
-                {% endif %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0 h5">Редактирование профиля</h3>
             </div>
-            
-            <div class="tab-pane fade" id="answers" role="tabpanel">
-                {% if user_answers %}
-                    {% for answer in user_answers %}
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-md-2 text-center">
-                                        <div class="profile-tab-stats">
-                                            <div class="profile-tab-stats__item">
-                                                <span class="profile-tab-stats__num">{{ answer.votes }}</span>
-                                                <span class="profile-tab-stats__lbl">votes</span>
-                                            </div>
-                                            {% if answer.is_accepted %}
-                                                <div class="profile-tab-stats__item">
-                                                    <span class="profile-tab-stats__num text-success" aria-hidden="true">✓</span>
-                                                    <span class="profile-tab-stats__lbl">accepted</span>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <h6>
-                                            <a href="#" class="text-decoration-none">
-                                                {{ answer.question_title }}
-                                            </a>
-                                        </h6>
-                                        <small class="text-muted">Answered 1 day ago</small>
-                                    </div>
-                                </div>
-                            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'core:profile' %}" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center py-4">
-                        <p class="text-muted">No answers provided yet.</p>
-                        <a href="{% url 'questions:index' %}" class="btn btn-primary">Browse Questions</a>
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="tab-pane fade" id="activity" role="tabpanel">
-                <div class="activity-feed">
-                    <div class="activity-item mb-3">
-                        <div class="d-flex">
-                            <div class="activity-icon me-3">
-                                <span class="badge bg-success">+5</span>
-                            </div>
-                            <div>
-                                <p class="mb-1">Answer accepted on <a href="#" class="text-decoration-none">How to use Django pagination?</a></p>
-                                <small class="text-muted">2 hours ago</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item mb-3">
-                        <div class="d-flex">
-                            <div class="activity-icon me-3">
-                                <span class="badge bg-primary">+2</span>
-                            </div>
-                            <div>
-                                <p class="mb-1">Received upvote on <a href="#" class="text-decoration-none">Best practices for Django views?</a></p>
-                                <small class="text-muted">1 day ago</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item mb-3">
-                        <div class="d-flex">
-                            <div class="activity-icon me-3">
-                                <span class="badge bg-info">Q</span>
-                            </div>
-                            <div>
-                                <p class="mb-1">Asked <a href="#" class="text-decoration-none">Django template inheritance tips?</a></p>
-                                <small class="text-muted">3 days ago</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    {% endif %}
+
+                    {% include 'includes/form_field.html' with field=form.username %}
+                    {% include 'includes/form_field.html' with field=form.email %}
+                    {% include 'includes/form_field.html' with field=form.first_name %}
+                    {% include 'includes/form_field.html' with field=form.last_name %}
+                    {% include 'includes/form_field.html' with field=form.avatar %}
+
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{% url 'questions:index' %}" class="btn btn-link">К списку вопросов</a>
+                </form>
             </div>
         </div>
     </div>

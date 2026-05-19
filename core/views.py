@@ -1,55 +1,119 @@
-from django.shortcuts import render, redirect
+from __future__ import annotations
+
+from django.conf import settings
 from django.contrib import messages
-from .mock_data import MOCK_USERS
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect, render, resolve_url
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
+
+from .forms import LoginForm, ProfileForm, SignupForm
 
 
-def login_view(request):
+_NEXT_PARAM = 'next'
+
+
+def _safe_next(request: HttpRequest, fallback: str | None = None) -> str:
+    raw = request.POST.get(_NEXT_PARAM) or request.GET.get(_NEXT_PARAM) or ''
+    if raw and url_has_allowed_host_and_scheme(
+        url=raw,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return raw
+    if fallback is None:
+        fallback = resolve_url(settings.LOGIN_REDIRECT_URL)
+    return fallback
+
+
+def _next_value(request: HttpRequest) -> str:
+    """Raw next value from POST or GET, used to round-trip the hidden input."""
+    return request.POST.get(_NEXT_PARAM) or request.GET.get(_NEXT_PARAM, '')
+
+
+@never_cache
+@require_http_methods(['GET', 'POST'])
+def login_view(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect(_safe_next(request))
+
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect(_safe_next(request))
+    else:
+        form = LoginForm(request)
 
-        if username and password:
-            messages.success(request, f'Welcome back, {username}!')
-            return redirect('questions:index')
-        else:
-            messages.error(request, 'Please enter both username and password.')
+    return render(
+        request,
+        'core/login.html',
+        {
+            'form': form,
+            'next': _next_value(request),
+        },
+    )
 
-    return render(request, 'core/login.html')
 
+@never_cache
+@require_http_methods(['GET', 'POST'])
+def signup_view(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect(_safe_next(request))
 
-def signup_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
+        form = SignupForm(data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Регистрация прошла успешно. Добро пожаловать!')
+            return redirect(_safe_next(request))
+    else:
+        form = SignupForm()
 
-        if not all([username, email, password, password_confirm]):
-            messages.error(request, 'All fields are required.')
-        elif password != password_confirm:
-            messages.error(request, 'Passwords do not match.')
-        else:
-            messages.success(request, f'Account created successfully for {username}!')
-            return redirect('core:login')
+    return render(
+        request,
+        'core/signup.html',
+        {
+            'form': form,
+            'next': _next_value(request),
+        },
+    )
 
-    return render(request, 'core/signup.html')
+
+@require_http_methods(['POST'])
+def logout_view(request: HttpRequest) -> HttpResponse:
+    logout(request)
+    fallback = resolve_url(settings.LOGOUT_REDIRECT_URL)
+    return redirect(_safe_next(request, fallback=fallback))
 
 
-def profile_view(request):
-    user = MOCK_USERS[0]
+@never_cache
+@login_required
+@require_http_methods(['GET', 'POST'])
+def profile_view(request: HttpRequest) -> HttpResponse:
+    profile = request.user.profile
+    if request.method == 'POST':
+        form = ProfileForm(
+            data=request.POST,
+            files=request.FILES,
+            instance=profile,
+        )
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Профиль обновлён.')
+            return redirect('core:profile')
+    else:
+        form = ProfileForm(instance=profile)
 
-    context = {
-        'user': user,
-        'user_questions': [
-            {'id': 1, 'title': 'How to use Django pagination?', 'votes': 15, 'answers': 3},
-            {'id': 2, 'title': 'Best practices for Django views?', 'votes': 8, 'answers': 1},
-            {'id': 3, 'title': 'Django template inheritance tips?', 'votes': 12, 'answers': 5},
-        ],
-        'user_answers': [
-            {'question_title': 'Python list comprehension', 'votes': 5, 'accepted': True},
-            {'question_title': 'Django URL patterns', 'votes': 3, 'accepted': False},
-            {'question_title': 'CSS flexbox layout', 'votes': 7, 'accepted': True},
-        ]
-    }
-
-    return render(request, 'core/profile.html', context)
+    return render(
+        request,
+        'core/profile.html',
+        {
+            'form': form,
+            'profile': profile,
+        },
+    )
